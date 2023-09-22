@@ -7,7 +7,7 @@ export async function find(req: Request, res: Response): Promise<void> {
     const nick = req.query.nick as string;
     const email = req.query.email as string;
     const result = await playerService.find(nick, email);
-    res.send(result.rows);
+    res.send(result);
 }
 
 export async function update(req: Request, res: Response): Promise<void> {
@@ -15,29 +15,25 @@ export async function update(req: Request, res: Response): Promise<void> {
     const player = req.body as UpdatePlayer;
     if (!player) throw customErrors.unprocessableEntity("player");
 
-    const result = await playerService.update(id, player);
-    if (result.rowCount <= 0) throw customErrors.conflict("nick or email");
+    const updatedPlayer = await playerService.update(id, player);
+    if (updatedPlayer == null) throw customErrors.conflict("nick or email");
 
-    const updatedPlayer = result.rows[0];
-    delete updatedPlayer.password;
-
-    res.send(updatedPlayer);
+    const { password, ...playerProfile } = updatedPlayer;
+    res.send(playerProfile);
 }
 
 export async function deleteById(_req: Request, res: Response): Promise<void> {
     const { id } = res.locals.user;
-    const result = await playerService.deleteById(id);
-    if (result.rowCount <= 0) throw customErrors.notFound("player");
+    const deletedPlayer = await playerService.deleteById(id);
+    if (deletedPlayer == null) throw customErrors.notFound("player");
 
-    const deletedPlayer = result.rows[0];
-    delete deletedPlayer.password;
-
-    res.send(deletedPlayer);
+    const { password, ...playerProfile } = deletedPlayer;
+    res.send(playerProfile);
 }
 
 export async function count(_req: Request, res: Response): Promise<void> {
-    const result = await playerService.count();
-    res.send(result.rows[0]);
+    const count = await playerService.count();
+    res.send(count);
 }
 
 const playerController = {

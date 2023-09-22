@@ -1,4 +1,5 @@
 import { CreatePlayer } from "@/protocols/player.protocols";
+import { Player } from "@prisma/client";
 import playerRepository from "@/repositories/player.repository";
 import customErrors from "@/errors/customErrors";
 import jwt from "jsonwebtoken";
@@ -8,26 +9,24 @@ import customParseFormat from "dayjs/plugin/customParseFormat";
 
 dayjs.extend(customParseFormat);
 
-export function signUp(player: CreatePlayer): Promise<any> {
-    const { password, birthday } = player;
-    if (typeof password !== "string") {
-        throw customErrors.unprocessableEntity("password");
-    }
+export async function signUp(player: CreatePlayer): Promise<Player>{
+    const { nick, email, password, birthday } = player;
+    
+    const result = await playerRepository.findNickOrEmail(nick, email);
+    console.log(result)
+    if (result.length > 0) throw customErrors.conflict("nick or email");
+
     const hash = bcrypt.hashSync(password, 10);
     player.password = hash;
-    player.birthday = dayjs(birthday, "DD-MM-YYYY");
+    player.birthday = new Date(dayjs(birthday, "DD-MM-YYYY").toString());
 
     return playerRepository.create(player);
 }
 
-export async function signIn(email: string, password: string): Promise<any> {
-    const result = await playerRepository.readByEmail(email);
-    if (result.rowCount <= 0) throw customErrors.notFound("email");
+export async function signIn(email: string, password: string): Promise<{token: string, player: Player}> {
+    const player: Player | null = await playerRepository.readByEmail(email);
+    if (player == null) throw customErrors.notFound("email");
 
-    const player = result.rows[0];
-    if (typeof player.password !== "string") {
-        throw customErrors.internalServerError();
-    }
     if (!bcrypt.compareSync(password, player.password)) {
         throw customErrors.unauthorized("password");
     }

@@ -10,7 +10,7 @@ export function find(nick: string, mail: string) {
 }
 
 export function update(id: number, player: UpdatePlayer) {
-    player.birthday = dayjs(player.birthday, "DD-MM-YYYY");
+    player.birthday = new Date(dayjs(player.birthday, "DD-MM-YYYY").toString());
     return playerRepository.update(id, player, dayjs());
 }
 
