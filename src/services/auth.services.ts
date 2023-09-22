@@ -45,7 +45,7 @@ export default authService;
 
 
 function generateErrorMessage(result: Array<Player>, nick: string, email: string): string {
-    const entities = []
+    const entities = [];
     if (result[0].nick === nick) entities.push("nick");
     if (result[0].email === email) entities.push("email");
 
