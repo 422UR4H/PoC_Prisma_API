@@ -10,7 +10,6 @@ export async function create(player: CreatePlayer): Promise<Player> {
     const newPlayer = await prisma.player.create({
         data: { nick, name, email, password, description, avatarUrl, birthday }
     });
-    console.log(newPlayer)
     return newPlayer;
     // return clientDB.query<Number>(`
     //     INSERT INTO players
@@ -62,10 +61,7 @@ export function find(nick: string, email: string) {
 
 export function findNickOrEmail(nick: string, email: string) {
     return prisma.player.findMany({
-        where: { OR: [
-            { nick },
-            { email },
-        ]}
+        where: { OR: [{ nick }, { email }] }
     });
 }
 
