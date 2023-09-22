@@ -11,7 +11,7 @@ export async function find(req: Request, res: Response): Promise<void> {
 }
 
 export async function update(req: Request, res: Response): Promise<void> {
-    const { id } = res.locals.user;
+    const { id } = res.locals.player;
     const player = req.body as UpdatePlayer;
     if (!player) throw customErrors.unprocessableEntity("player");
 
@@ -23,7 +23,7 @@ export async function update(req: Request, res: Response): Promise<void> {
 }
 
 export async function deleteById(_req: Request, res: Response): Promise<void> {
-    const { id } = res.locals.user;
+    const { id } = res.locals.player;
     const deletedPlayer = await playerService.deleteById(id);
     if (deletedPlayer == null) throw customErrors.notFound("player");
 

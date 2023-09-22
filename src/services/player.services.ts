@@ -5,13 +5,14 @@ import customParseFormat from "dayjs/plugin/customParseFormat";
 
 dayjs.extend(customParseFormat);
 
-export function find(nick: string, mail: string) {
-    return playerRepository.find(nick, mail);
+export function find(nick: string, email: string) {
+    return playerRepository.find(nick, email);
 }
 
-export function update(id: number, player: UpdatePlayer) {
+export async function update(id: number, player: UpdatePlayer) {
     player.birthday = new Date(dayjs(player.birthday, "DD-MM-YYYY").toString());
-    return playerRepository.update(id, player, dayjs());
+    const result = await playerRepository.update(id, player, dayjs());
+    return result;
 }
 
 export function deleteById(id: number) {

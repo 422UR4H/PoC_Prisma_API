@@ -11,14 +11,6 @@ export async function create(player: CreatePlayer): Promise<Player> {
         data: { nick, name, email, password, description, avatarUrl, birthday }
     });
     return newPlayer;
-    // return clientDB.query<Number>(`
-    //     INSERT INTO players
-    //         (nick, name, email, password, description, "avatarUrl", birthday)
-    //     VALUES ($1, $2, $3, $4, $5, $6, $7)
-    //     ON CONFLICT DO NOTHING
-    //     RETURNING id;`,
-    //     [nick, name, email, password, description, avatarUrl, birthday]
-    // );
 }
 
 export function readByEmail(email: string): Promise<Player | null> {
@@ -33,19 +25,23 @@ export function readByEmail(email: string): Promise<Player | null> {
 }
 
 export function find(nick: string, email: string) {
+    console.log(nick, ' ', email)
     return prisma.player.findMany({
         select: { nick: true, email: true },
         where: {
-            nick: {
-                contains: nick || undefined,
-                mode: "insensitive"
-            },
-            email: {
-                contains: email || undefined,
-                mode: "insensitive"
-            }
+            OR: [{
+                nick: {
+                    contains: nick || undefined,
+                    mode: "insensitive"
+                }
+            }, {
+                email: {
+                    contains: email || undefined,
+                    mode: "insensitive"
+                }
+            }]
         },
-        orderBy: { nick: "asc", email: "asc" },
+        orderBy: [{ nick: "asc" }, { email: "asc" }],
         take: LIMIT
     });
     // return clientDB.query<Player>(`
