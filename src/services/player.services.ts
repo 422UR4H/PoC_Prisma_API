@@ -11,7 +11,7 @@ export function find(nick: string, email: string) {
 
 export async function update(id: number, player: UpdatePlayer) {
     player.birthday = new Date(dayjs(player.birthday, "DD-MM-YYYY").toString());
-    const result = await playerRepository.update(id, player, dayjs());
+    const result = await playerRepository.update(id, player);
     return result;
 }
 

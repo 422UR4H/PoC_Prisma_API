@@ -33,7 +33,7 @@ export async function deleteById(_req: Request, res: Response): Promise<void> {
 
 export async function count(_req: Request, res: Response): Promise<void> {
     const count = await playerService.count();
-    res.send(count);
+    res.send({ count });
 }
 
 const playerController = {
