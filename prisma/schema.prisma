@@ -11,16 +11,33 @@ datasource db {
 }
 
 model Player {
-  id          Int      @id @default(autoincrement())
-  nick        String   @unique @db.VarChar(16)
-  email       String   @unique @db.VarChar(64)
-  password    String   @db.VarChar(255)
-  name        String   @db.VarChar(32)
-  description String?  @db.VarChar(255)
-  birthday    DateTime @db.Date()
+  id          Int         @id @default(autoincrement())
+  nick        String      @unique @db.VarChar(16)
+  email       String      @unique @db.VarChar(64)
+  password    String      @db.VarChar(255)
+  name        String      @db.VarChar(32)
+  description String?     @db.VarChar(255)
+  birthday    DateTime    @db.Date()
   avatarUrl   String?
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+  Character   Character[]
 
   @@map("players")
+}
+
+model Character {
+  id               Int      @id @default(autoincrement())
+  nick             String   @unique @db.VarChar(16)
+  name             String   @unique @db.VarChar(32)
+  briefDescription String?  @db.VarChar(64)
+  birthday         DateTime @db.Date()
+  avatarUrl        String?
+  backgroundImgUrl String?
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+  player           Player   @relation(fields: [playerId], references: [id])
+  playerId         Int
+
+  @@map("characters")
 }

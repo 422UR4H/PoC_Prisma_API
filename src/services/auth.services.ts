@@ -13,7 +13,7 @@ dayjs.extend(customParseFormat);
 
 export async function signUp(player: CreatePlayer): Promise<Player> {
     const { nick, email, password, birthday } = player;
-    const result = await playerRepository.findNickOrEmail(nick, email);
+    const result = await playerRepository.findByNickOrEmail(nick, email);
 
     if (result.length > 0) {
         throw customErrors.conflict(generateErrorMessage(result, nick, email));

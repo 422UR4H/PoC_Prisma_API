@@ -9,10 +9,9 @@ export function find(nick: string, email: string) {
     return playerRepository.find(nick, email);
 }
 
-export async function update(id: number, player: UpdatePlayer) {
+export function update(id: number, player: UpdatePlayer) {
     player.birthday = new Date(dayjs(player.birthday, "DD-MM-YYYY").toString());
-    const result = await playerRepository.update(id, player);
-    return result;
+    return playerRepository.update(id, player);
 }
 
 export function deleteById(id: number) {
