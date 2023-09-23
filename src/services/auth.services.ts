@@ -1,5 +1,6 @@
 import { CreatePlayer } from "@/protocols/player.protocols";
 import { Player } from "@prisma/client";
+import { Auth } from "@/protocols/auth.protocols";
 import playerRepository from "@/repositories/player.repository";
 import customErrors from "@/errors/customErrors";
 import jwt from "jsonwebtoken";
@@ -9,9 +10,11 @@ import customParseFormat from "dayjs/plugin/customParseFormat";
 
 dayjs.extend(customParseFormat);
 
+
 export async function signUp(player: CreatePlayer): Promise<Player> {
     const { nick, email, password, birthday } = player;
     const result = await playerRepository.findNickOrEmail(nick, email);
+
     if (result.length > 0) {
         throw customErrors.conflict(generateErrorMessage(result, nick, email));
     }
@@ -24,8 +27,8 @@ export async function signUp(player: CreatePlayer): Promise<Player> {
 
 export async function signIn(email: string, password: string): Promise<{ token: string, player: Player }> {
     const player: Player | null = await playerRepository.readByEmail(email);
-    if (player == null) throw customErrors.notFound("email");
 
+    if (player == null) throw customErrors.notFound("email");
     if (!bcrypt.compareSync(password, player.password)) {
         throw customErrors.unauthorized("password");
     }
@@ -37,8 +40,29 @@ export async function signIn(email: string, password: string): Promise<{ token: 
     return { token, player };
 }
 
+export async function update(id: number, email: string, password: string, newPassword: string | null) {
+    const player = await playerRepository.readById(id) as Auth;
+
+    if (player == null) throw customErrors.unauthorized();
+    if (!bcrypt.compareSync(password, player.password)) {
+        throw customErrors.unauthorized("password");
+    }
+    if (player.email !== email) {
+        const otherPlayer: Player | null = await playerRepository.readByEmail(email);
+
+        if (otherPlayer != null) throw customErrors.conflict("email");
+    }
+    
+    let hash = player.password;
+    if (typeof newPassword === "string" && !bcrypt.compareSync(newPassword, player.password)) {
+        hash = bcrypt.hashSync(newPassword, 10);
+    }
+    const result = await playerRepository.updateAuth(id, email, hash);
+    return result;
+}
+
 const authService = {
-    signUp, signIn
+    signUp, signIn, update
 };
 export default authService;
 

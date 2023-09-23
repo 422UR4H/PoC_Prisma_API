@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
-import { CreatePlayer } from "@/protocols/player.protocols";
 import { Player } from "@prisma/client";
-import { Auth } from "@/protocols/auth.protocols";
+import { CreatePlayer } from "@/protocols/player.protocols";
+import { Auth, UpdateAuth } from "@/protocols/auth.protocols";
 import authService from "@/services/auth.services";
 import httpStatus from "http-status";
 import customErrors from "@/errors/customErrors";
@@ -19,10 +19,20 @@ export async function signUp(req: Request, res: Response): Promise<void> {
 export async function signIn(req: Request, res: Response): Promise<void> {
     const { email, password } = req.body as Auth;
     const { token, player } = await authService.signIn(email, password);
+
     res.send({ token, player });
 }
 
+export async function update(req: Request, res: Response): Promise<void> {
+    const { id } = res.locals.player;
+    const { email, password, newPassword } = req.body as UpdateAuth;
+    const player = await authService.update(id, email, password, newPassword);
+
+    const { password: _password, ...updatedPlayer } = player;
+    res.send(updatedPlayer);
+}
+
 const authController = {
-    signUp, signIn
+    signUp, signIn, update
 }
 export default authController;

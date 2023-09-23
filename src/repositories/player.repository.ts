@@ -19,7 +19,6 @@ export function readByEmail(email: string): Promise<Player | null> {
 }
 
 export function find(nick: string, email: string) {
-    console.log(nick, ' ', email)
     return prisma.player.findMany({
         select: { nick: true, email: true },
         where: {
@@ -60,6 +59,13 @@ export function update(id: number, player: UpdatePlayer): Promise<Player> {
     });
 }
 
+export function updateAuth(id: number, email: string, password: string): Promise<Player> {
+    return prisma.player.update({
+        data: { email, password },
+        where: { id }
+    });
+}
+
 export function deleteById(id: number): Promise<Player> {
     return prisma.player.delete({
         where: { id }
@@ -72,6 +78,6 @@ export function count(): Promise<number> {
 
 const playerRepository = {
     readById, readByEmail, find, findNickOrEmail,
-    create, update, deleteById, count
+    create, update, updateAuth, deleteById, count
 };
 export default playerRepository;

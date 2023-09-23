@@ -1,6 +1,9 @@
-export type Auth = {
+export interface Auth {
     email: string,
     password: string
 };
-
 export type AuthSymbol = "email" | "password";
+
+export interface UpdateAuth extends Auth {
+    newPassword: string | null
+};

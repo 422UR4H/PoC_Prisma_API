@@ -1,7 +1,13 @@
-import { Auth } from "@/protocols/auth.protocols";
+import { Auth, UpdateAuth } from "@/protocols/auth.protocols";
 import Joi from "joi";
 
 export const authSchema = Joi.object<Auth>({
     email: Joi.string().email().min(9).max(64).required(),
     password: Joi.string().min(3).max(255).required()
+});
+
+export const updateAuthSchema = Joi.object<UpdateAuth>({
+    email: Joi.string().email().min(9).max(64).required(),
+    password: Joi.string().min(3).max(255).required(),
+    newPassword: Joi.string().min(3).max(255)
 });

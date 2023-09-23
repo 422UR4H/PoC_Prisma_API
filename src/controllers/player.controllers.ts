@@ -7,6 +7,7 @@ export async function find(req: Request, res: Response): Promise<void> {
     const nick = req.query.nick as string;
     const email = req.query.email as string;
     const result = await playerService.find(nick, email);
+
     res.send(result);
 }
 
@@ -25,6 +26,7 @@ export async function update(req: Request, res: Response): Promise<void> {
 export async function deleteById(_req: Request, res: Response): Promise<void> {
     const { id } = res.locals.player;
     const deletedPlayer = await playerService.deleteById(id);
+
     if (deletedPlayer == null) throw customErrors.notFound("player");
 
     const { password, ...playerProfile } = deletedPlayer;
