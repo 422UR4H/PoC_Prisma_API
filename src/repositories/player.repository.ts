@@ -1,15 +1,22 @@
 import prisma from "@/database/db.connection";
 import { LIMIT } from "@/utils/constants.utils";
 import { Player } from "@prisma/client";
-import { CreatePlayer, UpdatePlayer } from "@/protocols/player.protocols";
+import { UpdatePlayer } from "@/protocols/player.protocols";
+import { PlayerUser } from "@/protocols/user.protocols";
 
 
-export function create(player: CreatePlayer): Promise<Player> {
-    const { nick, name, email, password, description, avatarUrl, birthday } = player;
-    return prisma.player.create({
-        data: { nick, name, email, password, description, avatarUrl, birthday }
-    });
-}
+// export function create(player: PlayerUser): Promise<Player> {
+    // const { nick, name, email, password, description, avatarUrl, birthday } = player;
+    // return prisma.player.create({
+    //     data: { nick, name, description, avatarUrl, birthday, userId: 1 }
+    // });
+    // return prisma.player.create({
+    //     data: {
+    //         nick, name, description, avatarUrl, birthday,
+    //         user: { create: { email, password } }
+    //     }
+    // });
+// }
 
 export function readByEmail(email: string): Promise<Player | null> {
     return prisma.player.findUnique({ where: { email } });
@@ -71,6 +78,6 @@ export function find(nick: string, email: string) {
 
 const playerRepository = {
     readById, readByEmail, find, findByNickOrEmail,
-    create, update, updateAuth, deleteById, count
+    update, updateAuth, deleteById, count
 };
 export default playerRepository;

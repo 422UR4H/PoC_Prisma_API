@@ -1,6 +1,7 @@
-import { CreatePlayer, PlayerProfile } from "@/protocols/player.protocols";
-import { Player } from "@prisma/client";
-import { Auth } from "@/protocols/auth.protocols";
+import { Player, User } from "@prisma/client";
+import { PlayerProfile } from "@/protocols/player.protocols";
+import { AuthUser, PlayerUser } from "@/protocols/user.protocols";
+import { userRepository } from "@/repositories/user.repository";
 import playerRepository from "@/repositories/player.repository";
 import customErrors from "@/errors/customErrors";
 import jwt from "jsonwebtoken";
@@ -11,18 +12,18 @@ import customParseFormat from "dayjs/plugin/customParseFormat";
 dayjs.extend(customParseFormat);
 
 
-export async function signUp(player: CreatePlayer): Promise<Player> {
-    const { nick, email, password, birthday } = player;
+export async function signUp(playerUser: PlayerUser): Promise<User> {
+    const { nick, email, password, birthday } = playerUser as PlayerUser;
     const result = await playerRepository.findByNickOrEmail(nick, email);
 
     if (result.length > 0) {
         throw customErrors.conflict(generateErrorMessage(result, nick, email));
     }
     const hash = bcrypt.hashSync(password, 10);
-    player.password = hash;
-    player.birthday = new Date(dayjs(birthday, "DD-MM-YYYY").toString());
-
-    return playerRepository.create(player);
+    playerUser.password = hash;
+    playerUser.birthday = new Date(dayjs(birthday, "DD-MM-YYYY").toString());
+    
+    return userRepository.create(playerUser);
 }
 
 export async function signIn(email: string, password: string): Promise<{ token: string, player: PlayerProfile }> {
@@ -42,7 +43,7 @@ export async function signIn(email: string, password: string): Promise<{ token: 
 }
 
 export async function update(id: number, email: string, password: string, newPassword: string | null) {
-    const player = await playerRepository.readById(id) as Auth;
+    const player = await playerRepository.readById(id) as AuthUser;
 
     if (player == null) throw customErrors.unauthorized();
     if (!bcrypt.compareSync(password, player.password)) {
