@@ -5,8 +5,6 @@ import { CreateCharacter, UpdateCharacter } from "@/protocols/character.protocol
 
 
 export function create(playerId: number, character: CreateCharacter) {
-    const { nick, name, briefDescription, avatarUrl, backgroundImgUrl, birthday } = character;
-    console.log(birthday)
     // return prisma.character.create({
     //     data: {
     //         nick, name, birthday, playerId

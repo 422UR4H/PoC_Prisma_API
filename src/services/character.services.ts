@@ -8,10 +8,10 @@ import customParseFormat from "dayjs/plugin/customParseFormat";
 dayjs.extend(customParseFormat);
 
 export async function create(playerId: number, character: CreateCharacter) {
-    const result = await characterRepository.create(playerId, character);
+    const result = await characterRepository.readByNick(character.nick);
+    if (result != null) throw customErrors.conflict("nick of character");
 
-    if (result == null) throw customErrors.conflict("nick or email of character");
-    return result;
+    return characterRepository.create(playerId, character);
 }
 
 export async function readById(id: number, playerId: number): Promise<Character> {
