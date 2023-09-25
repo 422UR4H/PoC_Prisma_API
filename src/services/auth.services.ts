@@ -1,4 +1,4 @@
-import { CreatePlayer } from "@/protocols/player.protocols";
+import { CreatePlayer, PlayerProfile } from "@/protocols/player.protocols";
 import { Player } from "@prisma/client";
 import { Auth } from "@/protocols/auth.protocols";
 import playerRepository from "@/repositories/player.repository";
@@ -25,19 +25,20 @@ export async function signUp(player: CreatePlayer): Promise<Player> {
     return playerRepository.create(player);
 }
 
-export async function signIn(email: string, password: string): Promise<{ token: string, player: Player }> {
+export async function signIn(email: string, password: string): Promise<{ token: string, player: PlayerProfile }> {
     const player: Player | null = await playerRepository.readByEmail(email);
 
     if (player == null) throw customErrors.notFound("email");
     if (!bcrypt.compareSync(password, player.password)) {
         throw customErrors.unauthorized("password");
     }
+    const { password: _password, ...playerProfile } = player;
     const token = jwt.sign(
         { id: player.id },
         process.env.JWT_SECRET || process.env.SECRET_KEY || "test",
         { expiresIn: 24 * 60 * 60 * 7 }
     );
-    return { token, player };
+    return { token, player: playerProfile };
 }
 
 export async function update(id: number, email: string, password: string, newPassword: string | null) {
