@@ -1,20 +1,40 @@
 import customErrors from "@/errors/customErrors";
 import { CreateCharacter, UpdateCharacter } from "@/protocols/character.protocols";
 import characterRepository from "@/repositories/character.repository";
+import { Character } from "@prisma/client";
 import dayjs from "dayjs";
 import customParseFormat from "dayjs/plugin/customParseFormat";
 
 dayjs.extend(customParseFormat);
 
-export function create(playerId: number, character: CreateCharacter) {
-    return characterRepository.create(playerId, character);
+export async function create(playerId: number, character: CreateCharacter) {
+    const result = await characterRepository.create(playerId, character);
+
+    if (result == null) throw customErrors.conflict("nick or email of character");
+    return result;
 }
 
-export function find(nick: string) {
-    return characterRepository.find(nick);
+export async function readById(id: number, playerId: number): Promise<Character> {
+    const character = await characterRepository.readById(id);
+
+    if (character == null) throw customErrors.notFound("character");
+    if (character.playerId !== playerId) throw customErrors.unauthorized("character id");
+    return character;
 }
 
-export async function update(id: number, playerId: number, character: UpdateCharacter) {
+export async function readByNick(nick: string, playerId: number): Promise<Character> {
+    const character = await characterRepository.readByNick(nick);
+
+    if (character == null) throw customErrors.notFound("character");
+    if (character.playerId !== playerId) throw customErrors.unauthorized("character id");
+    return character;
+}
+
+export function readAll(id: number): Promise<Character[]> {
+    return characterRepository.readAll(id);
+}
+
+export async function update(id: number, playerId: number, character: UpdateCharacter): Promise<Character> {
     const result = await characterRepository.readById(id);
 
     if (!result) throw customErrors.notFound("character");
@@ -32,11 +52,17 @@ export async function deleteById(id: number, playerId: number) {
     return characterRepository.deleteById(id);
 }
 
+export function find(nick: string) {
+    return characterRepository.find(nick);
+}
+
 export function count() {
     return characterRepository.count();
 }
 
 const characterService = {
-    create, update, deleteById, find, count
+    create, readById, readByNick, readAll,
+    update, deleteById,
+    find, count
 }
 export default characterService;

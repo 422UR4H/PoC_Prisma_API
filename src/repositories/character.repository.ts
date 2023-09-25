@@ -4,10 +4,29 @@ import { Character } from "@prisma/client";
 import { CreateCharacter, UpdateCharacter } from "@/protocols/character.protocols";
 
 
-export function create(playerId: number, character: CreateCharacter): Promise<Character> {
+export function create(playerId: number, character: CreateCharacter) {
     const { nick, name, briefDescription, avatarUrl, backgroundImgUrl, birthday } = character;
-    return prisma.character.create({
-        data: { nick, name, briefDescription, avatarUrl, backgroundImgUrl, birthday, playerId }
+    console.log(birthday)
+    // return prisma.character.create({
+    //     data: {
+    //         nick, name, birthday, playerId
+    //     }
+    // });
+    // return prisma.character.create({
+    //     data: {
+    //         nick, name, birthday,
+    //         player: {
+    //             connect: { id: playerId }
+    //         }
+    //     },
+    // });
+    return prisma.player.update({
+        where: { id: playerId },
+        data: {
+            Character: {
+                create: character
+            }
+        },
     });
 }
 
