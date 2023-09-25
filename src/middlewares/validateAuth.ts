@@ -5,6 +5,9 @@ import playerRepository from "@/repositories/player.repository";
 import customErrors from "@/errors/customErrors";
 import httpStatus from "http-status";
 import dotenv from "dotenv";
+import { UserProfile } from "@/protocols/user.protocols";
+import { userRepository } from "@/repositories/user.repository";
+import { User } from "@prisma/client";
 
 dotenv.config();
 
@@ -18,11 +21,11 @@ export default function validateAuth(req: Request, res: Response, next: NextFunc
         jwt.verify(token, secret, async (error: VerifyErrors, decoded: JwtPayload) => {
             if (error) return res.status(httpStatus.UNAUTHORIZED).send("token is not valid");
 
-            const player = await playerRepository.readById(decoded.id);
-            if (player == null) return res.status(httpStatus.UNAUTHORIZED).send("player does not exist");
+            const user: User | null = await userRepository.readById(decoded.id);
+            if (user == null) return res.status(httpStatus.UNAUTHORIZED).send("user does not exist");
 
-            const { password, ...playerProfile } = player;
-            res.locals.player = playerProfile as PlayerProfile;
+            const { password, ...userProfile } = user;
+            res.locals.user = userProfile as UserProfile;
             return next();
         });
     } catch (err) {

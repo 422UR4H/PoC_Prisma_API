@@ -14,7 +14,7 @@ dayjs.extend(customParseFormat);
 
 export async function signUp(playerUser: PlayerUser): Promise<User> {
     const { nick, email, password, birthday } = playerUser as PlayerUser;
-    const result = await playerRepository.findByNickOrEmail(nick, email);
+    const result = await userRepository.findByNickOrEmail(nick, email);
 
     if (result.length > 0) {
         throw customErrors.conflict(generateErrorMessage(result, nick, email));
@@ -22,55 +22,59 @@ export async function signUp(playerUser: PlayerUser): Promise<User> {
     const hash = bcrypt.hashSync(password, 10);
     playerUser.password = hash;
     playerUser.birthday = new Date(dayjs(birthday, "DD-MM-YYYY").toString());
-    
+
     return userRepository.create(playerUser);
 }
 
-export async function signIn(email: string, password: string): Promise<{ token: string, player: PlayerProfile }> {
-    const player: Player | null = await playerRepository.readByEmail(email);
+export async function signIn(email: string, password: string) {
+    const playerUser = await userRepository.readByEmail(email);
 
-    if (player == null) throw customErrors.notFound("email");
-    if (!bcrypt.compareSync(password, player.password)) {
+    if (playerUser == null) throw customErrors.notFound("email");
+    if (!bcrypt.compareSync(password, playerUser.password)) {
         throw customErrors.unauthorized("password");
     }
-    const { password: _password, ...playerProfile } = player;
+    const { password: _password, ...playerUserProfile } = playerUser;
     const token = jwt.sign(
-        { id: player.id },
+        { id: playerUser.id },
         process.env.JWT_SECRET || process.env.SECRET_KEY || "test",
         { expiresIn: 24 * 60 * 60 * 7 }
     );
-    return { token, player: playerProfile };
+    return { token, playerUser: playerUserProfile };
 }
 
 export async function update(id: number, email: string, password: string, newPassword: string | null) {
-    const player = await playerRepository.readById(id) as AuthUser;
+    const user = await userRepository.readById(id);
 
-    if (player == null) throw customErrors.unauthorized();
-    if (!bcrypt.compareSync(password, player.password)) {
+    if (user == null) throw customErrors.unauthorized();
+    if (!bcrypt.compareSync(password, user.password)) {
         throw customErrors.unauthorized("password");
     }
-    if (player.email !== email) {
-        const otherPlayer: Player | null = await playerRepository.readByEmail(email);
+    if (user.email !== email) {
+        const otherUser: User | null = await userRepository.readByEmail(email);
 
-        if (otherPlayer != null) throw customErrors.conflict("email");
+        if (otherUser != null) throw customErrors.conflict("email");
     }
-    
-    let hash = player.password;
-    if (typeof newPassword === "string" && !bcrypt.compareSync(newPassword, player.password)) {
+
+    let hash = user.password;
+    if (typeof newPassword === "string" && !bcrypt.compareSync(newPassword, user.password)) {
         hash = bcrypt.hashSync(newPassword, 10);
     }
-    const result = await playerRepository.updateAuth(id, email, hash);
+    const result = await userRepository.update(id, email, hash);
     return result;
 }
 
+export function find(nick: string, email: string) {
+    return userRepository.find(nick, email);
+}
+
 const authService = {
-    signUp, signIn, update
+    signUp, signIn, update, find
 };
 export default authService;
 
 
 
-function generateErrorMessage(result: Array<Player>, nick: string, email: string): string {
+function generateErrorMessage(result: Array<any>, nick: string, email: string): string {
     const entities = [];
     if (result[0].nick === nick) entities.push("nick");
     if (result[0].email === email) entities.push("email");

@@ -5,10 +5,6 @@ import customParseFormat from "dayjs/plugin/customParseFormat";
 
 dayjs.extend(customParseFormat);
 
-export function find(nick: string, email: string) {
-    return playerRepository.find(nick, email);
-}
-
 export function update(id: number, player: UpdatePlayer) {
     player.birthday = new Date(dayjs(player.birthday, "DD-MM-YYYY").toString());
     return playerRepository.update(id, player);
@@ -23,6 +19,6 @@ export function count() {
 }
 
 const playerService = {
-    update, deleteById, find, count
+    update, deleteById, count
 }
 export default playerService;

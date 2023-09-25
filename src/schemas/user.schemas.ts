@@ -1,5 +1,8 @@
 import { AuthUser, PlayerUser, UpdateUser } from "@/protocols/user.protocols";
-import Joi from "joi";
+import Joi, { Root } from "joi";
+import JoiDate from "@joi/date";
+
+const JoiDateExtended = Joi.extend(JoiDate);
 
 export const userSchema = Joi.object<AuthUser>({
     email: Joi.string().email().min(9).max(64).required(),
@@ -19,5 +22,5 @@ export const userPlayerSchema = Joi.object<PlayerUser>({
     password: Joi.string().min(3).max(255).required(),
     description: Joi.string().max(255),
     avatarUrl: Joi.string().uri(),
-    birthday: Joi.date().format('DD-MM-YYYY').less('now').required()
+    birthday: JoiDateExtended.date().format('DD-MM-YYYY').less('now').required()
 });

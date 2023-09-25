@@ -16,13 +16,13 @@ export async function signUp(req: Request, res: Response): Promise<void> {
 
 export async function signIn(req: Request, res: Response): Promise<void> {
     const { email, password } = req.body as AuthUser;
-    const { token, player } = await authService.signIn(email, password);
+    const { token, playerUser } = await authService.signIn(email, password);
 
-    res.send({ token, player });
+    res.send({ token, playerUser });
 }
 
 export async function update(req: Request, res: Response): Promise<void> {
-    const { id } = res.locals.player;
+    const { id } = res.locals.user;
     const { email, password, newPassword } = req.body as UpdateUser;
     const player = await authService.update(id, email, password, newPassword);
 
