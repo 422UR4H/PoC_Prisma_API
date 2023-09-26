@@ -21,7 +21,6 @@ export async function update(req: Request, res: Response): Promise<void> {
     const updatedPlayer = await playerService.update(id, player);
     if (updatedPlayer == null) throw customErrors.conflict("nick or email");
 
-    // const { password, ...playerProfile } = updatedPlayer;
     res.send(updatedPlayer);
 }
 
@@ -30,7 +29,6 @@ export async function deleteById(_req: Request, res: Response): Promise<void> {
     const deletedPlayer = await playerService.deleteById(id);
 
     if (deletedPlayer == null) throw customErrors.notFound("player");
-    // const { password, ...playerProfile } = deletedPlayer;
     res.send(deletedPlayer);
 }
 

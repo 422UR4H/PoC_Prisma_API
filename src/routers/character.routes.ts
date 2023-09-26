@@ -6,13 +6,14 @@ import { create, readById, readByNick, readAll, count, update, deleteById, find 
 
 const router = Router();
 router
-    .post("/", validateAuth, validateSchema(characterSchema), create)
     .get("/", readAll)
-    .get("/by-id/:id", validateAuth, readById)
-    .get("/by-nick/:nick", validateAuth, readByNick)
-    .get("/find-by", find)
     .get("/count", count)
-    .put("/:id", validateAuth, validateSchema(characterSchema), update)
-    .delete("/:id", validateAuth, deleteById);
+    .get("/find-by", find)
+    .all("/*", validateAuth)
+    .get("/by-id/:id", readById)
+    .get("/by-nick/:nick", readByNick)
+    .post("/", validateSchema(characterSchema), create)
+    .put("/:id", validateSchema(characterSchema), update)
+    .delete("/:id", deleteById);
 
 export default router;

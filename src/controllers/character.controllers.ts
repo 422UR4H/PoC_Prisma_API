@@ -14,7 +14,7 @@ export async function create(req: Request, res: Response): Promise<void> {
     character.birthday = new Date(dayjs(character.birthday, "DD-MM-YYYY").toString());
     const result = await characterService.create(id, character);
 
-    res.status(httpStatus.CREATED).send(result);
+    res.status(httpStatus.CREATED).send(result.Character[0]);
 }
 
 export async function readById(req: Request, res: Response): Promise<void> {

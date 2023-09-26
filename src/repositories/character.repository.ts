@@ -18,13 +18,12 @@ export function create(playerId: number, character: CreateCharacter) {
     //         }
     //     },
     // });
+    // character.birthday = new Date()
+    // console.log(character.birthday)
     return prisma.player.update({
         where: { id: playerId },
-        data: {
-            Character: {
-                create: character
-            }
-        },
+        data: { Character: { create: character } },
+        select: { Character: { where: { nick: character.nick } } },
     });
 }
 

@@ -47,7 +47,7 @@ export function unprocessableEntity(entity?: string | Array<string>): CustomErro
     );
 }
 export function internalServerError(message: string | void): CustomError {
-    if (typeof message !== "string") message = "internal server error";
+    if (message == null) message = "internal server error";
     return new CustomError(
         "internalServerError",
         message,

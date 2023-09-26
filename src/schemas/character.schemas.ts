@@ -7,8 +7,9 @@ const JoiExtended = Joi.extend(JoiDate) as Root;
 export const characterSchema = Joi.object<CreateCharacter>({
     nick: Joi.string().min(4).max(16).required(),
     name: Joi.string().min(4).max(32).required(),
-    briefDescription: Joi.string().max(255),
+    exp: Joi.number().integer().min(0), // FIXME: limit max number too
     avatarUrl: Joi.string().uri(),
     backgroundImgUrl: Joi.string().uri(),
+    briefDescription: Joi.string().max(255),
     birthday: JoiExtended.date().format('DD-MM-YYYY').less('now').required()
 });

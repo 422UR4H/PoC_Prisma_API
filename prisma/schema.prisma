@@ -39,7 +39,7 @@ model Character {
   id               Int      @id @default(autoincrement())
   nick             String   @unique @db.VarChar(16)
   name             String   @db.VarChar(32)
-  exp              Int
+  exp              Int      @default(0)
   briefDescription String?  @db.VarChar(64)
   birthday         DateTime @db.Date()
   avatarUrl        String?
