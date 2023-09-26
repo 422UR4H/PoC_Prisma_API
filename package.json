@@ -6,11 +6,15 @@
   "scripts": {
     "build": "tsc && tsc-alias",
     "start": "node dist/index.js",
+    "seed": "prisma db seed",
     "dev": "nodemon src/index.ts",
     "migrate:dev": "npx prisma migrate dev"
   },
   "author": "422UR4H",
   "license": "ISC",
+  "prisma": {
+    "seed": "ts-node prisma/seed.ts"
+  },
   "devDependencies": {
     "@types/bcrypt": "^5.0.0",
     "@types/express": "^4.17.17",
