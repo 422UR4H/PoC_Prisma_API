@@ -13,7 +13,7 @@ router
     .get("/by-id/:id", readById)
     .get("/by-nick/:nick", readByNick)
     .post("/", validateSchema(characterSchema), create)
-    .put("/:id", validateSchema(characterSchema), update)
+    .patch("/:id", validateSchema(characterSchema), update)
     .delete("/:id", deleteById);
 
 export default router;

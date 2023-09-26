@@ -47,7 +47,7 @@ export async function readAll(req: Request, res: Response): Promise<void> {
 
 export async function update(req: Request, res: Response): Promise<void> {
     const id = Number(req.params.id);
-    if (!id) throw customErrors.badRequest("id is required");
+    if (!id) throw customErrors.badRequest("id is not valid");
 
     const userId = res.locals.user.id as number;
     const character = req.body as UpdateCharacter;
