@@ -32,9 +32,14 @@ function update(id: number, email: string, password: string): Promise<User> {
 }
 
 export function findByNickOrEmail(nick: string, email: string) {
-    return prisma.user.findMany({
+    return prisma.user.findFirst({
         where: { OR: [{ email }, { player: { nick } }] },
-        include: { player: true }
+        select: {
+            email: true,
+            player: {
+                select: { nick: true }
+            }
+        }
     });
 }
 

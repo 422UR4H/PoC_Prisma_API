@@ -16,8 +16,12 @@ export async function signUp(playerUser: PlayerUser): Promise<User> {
     const { nick, email, password, birthday } = playerUser as PlayerUser;
     const result = await userRepository.findByNickOrEmail(nick, email);
 
-    if (result.length > 0) {
-        throw customErrors.conflict(generateErrorMessage(result, nick, email));
+    if (result != null) {
+        const keyValues: KeyValues = {
+            email: result.email,
+            nick: result.player?.nick
+        }
+        throw customErrors.conflict(generateErrorMessage(keyValues, nick, email));
     }
     const hash = bcrypt.hashSync(password, 10);
     playerUser.password = hash;
@@ -73,11 +77,15 @@ const authService = {
 export default authService;
 
 
-
-function generateErrorMessage(result: Array<any>, nick: string, email: string): string {
+type KeyValues = {
+    email: string | undefined,
+    nick: string | undefined
+}
+function generateErrorMessage(result: KeyValues, nick: string, email: string): string {
     const entities = [];
-    if (result[0].nick === nick) entities.push("nick");
-    if (result[0].email === email) entities.push("email");
+    console.log(result)
+    if (result.nick === nick) entities.push("nick");
+    if (result.email === email) entities.push("email");
 
     let message = entities[0];
     if (entities.length > 1) message = entities.join(" and ");
